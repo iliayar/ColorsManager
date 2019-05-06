@@ -1,10 +1,10 @@
 ## Colors
 
 For make:
-```gcc -lstdc++ src/color-utils.cpp -o color-utils```
+`gcc -lstdc++ src/color-utils.cpp -o color-utils`
 
 For run:
-```./color-utils```
+`./color-utils`
 
 Help:
 * l - list color table
@@ -22,8 +22,10 @@ Help:
 Rofi configuration:
 Pass 7 ids(id0,id1,..):
 ```
-rofi.color-normal: id0, id1, id2, id3, id4
-rofi.color-window: id5, id6
+!                  'bg', 'fg', 'bgalt','hlbg','hlfg'
+rofi.color-normal:  id0,  id1,  id2,     id3,   id4
+!                  'background', 'border'
+rofi.color-window:     id5,        id6
 ```
 
 Colors configuration:
