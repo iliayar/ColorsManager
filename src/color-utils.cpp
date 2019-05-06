@@ -20,6 +20,11 @@ void init() {
 	cmd["gx"] = 3;
 	cmd["gr"] = 4;
 	cmd["gt"] = 5;
+	cmd["mx"] = 6;
+	cmd["mr"] = 7;
+	cmd["mt"] = 8;
+	cmd["-r"] = 9;
+
 
 	color_order[0] = "black dark/light";
 	color_order[1] = "red dark/light";
@@ -127,11 +132,126 @@ void gen_rofi(std::vector<std::string> xcolors, std::string path) {
 	std::ofstream out(path);
 	out << "! State:           \'bg\',     \'fg\',     \'bgalt\',  \'hlbg\',   \'hlfg\'" << std::endl;
 	out << "rofi.color-normal: " << xcolors[rofi_order[0]] << ", " << xcolors[rofi_order[1]] << ", " <<
-	xcolors[rofi_order[2]] << ", " << xcolors[rofi_order[3]] << ", " << xcolors[rofi_order[4]] << std::endl;;
+	xcolors[rofi_order[2]] << ", " << xcolors[rofi_order[3]] << ", " << xcolors[rofi_order[4]] << std::endl;
 	out << std::endl;
 	out << "!                  'background', 'border'" << std::endl;
 	out << "rofi.color-window: " << xcolors[rofi_order[5]] << ", " << xcolors[rofi_order[6]] << std::endl;
 	out.close();
+}
+
+void merge_xresources(std::vector<std::string> xcolors, std::string path) {
+	std::ifstream res(path);
+	std::ofstream temp(path + ".temp");
+
+	if(!res) {
+		std::cout << "Cannot open file " << path << std::endl;
+		exit(1);
+	}
+
+	std::string line;
+	const std::regex line_regex("^\\*(color[0-9]{1,2}|background|foreground|cursorColor):.*#[0-9a-fA-F]{6}");
+
+
+	while(res.good()) {
+		std::getline(res,line);
+		if(std::regex_match(line,line_regex)) {
+
+			if(line[1] == 'b') {
+				temp << "*background: " << xcolors[16] << std::endl;
+			} else if(line[1] == 'f') {
+				temp << "*foreground: " << xcolors[17] << std::endl;
+			} else if(line[2] == 'u') {
+				temp << "*cursorColor: " << xcolors[18] << std::endl;
+			} else {
+				temp << "*color";
+				int color_num = line[6] - '0';
+				if(line[7] != ':')
+					color_num = color_num*10 + (line[7] - '0');
+				temp << color_num << ": " << xcolors[color_num] << std::endl;
+			}
+			continue;
+		}
+		temp << line << std::endl;
+	}
+
+
+	res.close();
+	temp.close();
+	system( std::string("mv " + path + ".temp " + path).c_str());
+}
+
+void merge_termite(std::vector<std::string> xcolors, std::string path) {
+	std::ifstream res(path);
+	std::ofstream temp(path + ".temp");
+
+	if(!res) {
+		std::cout << "Cannot open file " << path << std::endl;
+		exit(1);
+	}
+
+	std::string line;
+	const std::regex line_regex("^(color[0-9]{1,2}|background|foreground|cursor).*=.*#[0-9a-fA-F]{6}");
+
+
+	while(res.good()) {
+		std::getline(res,line);
+		if(std::regex_match(line,line_regex)) {
+
+			if(line[0] == 'b') {
+				temp << "background = " << xcolors[16] << std::endl;
+			} else if(line[0] == 'f') {
+				temp << "foreground = " << xcolors[17] << std::endl;
+			} else if(line[1] == 'u') {
+				temp << "cursorColor = " << xcolors[18] << std::endl;
+			} else {
+				temp << "color";
+				int color_num = line[5] - '0';
+				if(line[6] >= '0' && line[6] <= 9)
+					color_num = color_num*10 + (line[6] - '0');
+				temp << color_num << " = " << xcolors[color_num] << std::endl;
+			}
+			continue;
+		}
+		temp << line << std::endl;
+	}
+
+
+	res.close();
+	temp.close();
+	system( std::string("mv " + path + ".temp " + path).c_str());
+}
+
+void merge_rofi(std::vector<std::string> xcolors, std::string path) {
+	std::ifstream res(path);
+	std::ofstream temp(path + ".temp");
+
+	if(!res) {
+		std::cout << "Cannot open file " << path << std::endl;
+		exit(1);
+	}
+
+	std::string line;
+	const std::regex line_regex("^rofi.color-(normal|window):");
+
+
+	while(res.good()) {
+		std::getline(res,line);
+		if(std::regex_match(line,line_regex)) {
+			if(line[12] == 'n') {
+				temp << "rofi.color-normal: " << xcolors[rofi_order[0]] << ", " << xcolors[rofi_order[1]] << ", " <<
+				xcolors[rofi_order[2]] << ", " << xcolors[rofi_order[3]] << ", " << xcolors[rofi_order[4]] << std::endl;
+			} else {
+				temp << "rofi.color-window: " << xcolors[rofi_order[5]] << ", " << xcolors[rofi_order[6]] << std::endl;
+			}
+			continue;
+		}
+		temp << line << std::endl;
+	}
+
+
+	res.close();
+	temp.close();
+	system( std::string("mv " + path + ".temp " + path).c_str());
 }
 
 int main(int argc, char *argv[]) {
@@ -161,6 +281,32 @@ int main(int argc, char *argv[]) {
 			case 5:
 				i++;
 				gen_termite(get_xcolors(),argv[i]);
+			break;
+			case 6:
+				i++;
+				merge_xresources(get_xcolors(),argv[i]);
+			break;
+			case 7:
+				i++;
+				merge_rofi(get_xcolors(),argv[i]);
+			break;
+			case 8:
+				i++;
+				merge_termite(get_xcolors(),argv[i]);
+			break;
+			case 9:
+				if(argc - i < 7) {
+					printf("Need 7 numbers for rofi setup");
+					exit(1);
+				}
+				rofi_order[0] = std::stoi(argv[i+1]);
+				rofi_order[1] = std::stoi(argv[i+2]);
+				rofi_order[2] = std::stoi(argv[i+3]);
+				rofi_order[3] = std::stoi(argv[i+4]);
+				rofi_order[4] = std::stoi(argv[i+5]);
+				rofi_order[5] = std::stoi(argv[i+6]);
+				rofi_order[6] = std::stoi(argv[i+7]);
+				i += 7;
 			break;
 			default:
 				printf("%s: Command not found\n",argv[i]);
