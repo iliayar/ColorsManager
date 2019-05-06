@@ -14,7 +14,13 @@ std::map<int,std::string> color_order;
 
 std::vector<int> rofi_order(7);
 
+std::vector<std::string> global_xcolors(19);
+
+int xcolors_mod = 0;
+
 void init() {
+	xresources_path = std::getenv("HOME") + xresources_path;
+
 	cmd["l"]  = 1;
 	cmd["-p"] = 2;
 	cmd["gx"] = 3;
@@ -24,6 +30,7 @@ void init() {
 	cmd["mr"] = 7;
 	cmd["mt"] = 8;
 	cmd["-r"] = 9;
+	cmd["-c"] = 10;
 
 
 	color_order[0] = "black dark/light";
@@ -45,7 +52,7 @@ void init() {
 }
 
 
-std::vector<std::string> get_xcolors() {
+std::vector<std::string> get_xcolors_xresources() {
 //void get_xcolors() {
 	std::vector<std::string> xcolors(19);
 
@@ -254,13 +261,27 @@ void merge_rofi(std::vector<std::string> xcolors, std::string path) {
 	system( std::string("mv " + path + ".temp " + path).c_str());
 }
 
+
+std::vector<std::string> get_xcolors() {
+	switch (xcolors_mod) {
+		case 0:
+			return get_xcolors_xresources();
+		break;
+		case 1:
+			return global_xcolors;
+		break;
+		default:
+			return get_xcolors_xresources();
+	}
+}
+
+
 int main(int argc, char *argv[]) {
 	init();
 	if(argc < 2) {
 		printf("Please specify the command\n");
 		return 0;
 	}
-	xresources_path = std::getenv("HOME") + xresources_path;
 	for(int i = 1; i < argc; ++i) {
 		switch (cmd[argv[i]]) {
 			case 1:
@@ -299,14 +320,21 @@ int main(int argc, char *argv[]) {
 					printf("Need 7 numbers for rofi setup");
 					exit(1);
 				}
-				rofi_order[0] = std::stoi(argv[i+1]);
-				rofi_order[1] = std::stoi(argv[i+2]);
-				rofi_order[2] = std::stoi(argv[i+3]);
-				rofi_order[3] = std::stoi(argv[i+4]);
-				rofi_order[4] = std::stoi(argv[i+5]);
-				rofi_order[5] = std::stoi(argv[i+6]);
-				rofi_order[6] = std::stoi(argv[i+7]);
+				for(int q = 0; q < 7; ++q) {
+						rofi_order[q] = std::stoi(argv[i+q+1]);
+				}
 				i += 7;
+			break;
+			case 10:
+				xcolors_mod = 1;
+				if(argc - i < 19) {
+					printf("Need 19 numbers for colors setup");
+					exit(1);
+				}
+				for(int q = 0; q < 19; ++q) {
+					global_xcolors[q] = argv[i+q+1];
+				}
+				i+=19;
 			break;
 			default:
 				printf("%s: Command not found\n",argv[i]);
