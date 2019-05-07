@@ -74,12 +74,12 @@ std::vector<std::string> get_xcolors_xresources() {
 			std::smatch color_match;
 			std::regex_search(line,color_match,color_regex);
 			//std::cout << color_match[0] << std::endl;
-			int color_num;
-			if(line[1] == 'b') {
+			int color_num = 0;
+			if(std::regex_match(line, std::regex("^\\*background:.*"))) {
 				color_num = 16;
-			} else if(line[1] == 'f') {
+			} else if(std::regex_match(line, std::regex("^\\*foreground:.*"))) {
 				color_num = 17;
-			} else if(line[2] == 'u') {
+			} else if(std::regex_match(line, std::regex("^\\*cursorColor:.*"))) {
 				color_num = 18;
 			} else {
 				color_num = line[6] - '0';
@@ -163,11 +163,11 @@ void merge_xresources(std::vector<std::string> xcolors, std::string path) {
 		std::getline(res,line);
 		if(std::regex_match(line,line_regex)) {
 
-			if(line[1] == 'b') {
+			if(std::regex_match(line, std::regex("^\\*background:.*"))) {
 				temp << "*background: " << xcolors[16] << std::endl;
-			} else if(line[1] == 'f') {
+			} else if(std::regex_match(line, std::regex("^\\*foreground:.*"))) {
 				temp << "*foreground: " << xcolors[17] << std::endl;
-			} else if(line[2] == 'u') {
+			} else if(std::regex_match(line, std::regex("^\\*cursorColor:.*"))) {
 				temp << "*cursorColor: " << xcolors[18] << std::endl;
 			} else {
 				temp << "*color";
@@ -204,11 +204,11 @@ void merge_termite(std::vector<std::string> xcolors, std::string path) {
 		std::getline(res,line);
 		if(std::regex_match(line,line_regex)) {
 
-			if(line[0] == 'b') {
+			if(std::regex_match(line, std::regex("^\\*background.*"))) {
 				temp << "background = " << xcolors[16] << std::endl;
-			} else if(line[0] == 'f') {
+			} else if(std::regex_match(line, std::regex("^\\*foreground.*"))) {
 				temp << "foreground = " << xcolors[17] << std::endl;
-			} else if(line[1] == 'u') {
+			} else if(std::regex_match(line, std::regex("^\\*cursorColor.*"))) {
 				temp << "cursorColor = " << xcolors[18] << std::endl;
 			} else {
 				temp << "color";
@@ -244,7 +244,7 @@ void merge_rofi(std::vector<std::string> xcolors, std::string path) {
 	while(res.good()) {
 		std::getline(res,line);
 		if(std::regex_match(line,line_regex)) {
-			if(line[12] == 'n') {
+			if(std::regex_match(line, std::regex("^rofi.color-normal:.*"))) {
 				temp << "rofi.color-normal: " << xcolors[rofi_order[0]] << ", " << xcolors[rofi_order[1]] << ", " <<
 				xcolors[rofi_order[2]] << ", " << xcolors[rofi_order[3]] << ", " << xcolors[rofi_order[4]] << std::endl;
 			} else {
