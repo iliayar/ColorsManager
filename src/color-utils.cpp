@@ -75,7 +75,7 @@ std::vector<std::string> get_xcolors() {
 	}
 
 	std::string line;
-	const std::regex line_regex("^\\*(color[0-9]{1,2}|background|foreground|cursorColor):.*#[0-9a-fA-F]{6}");
+	const std::regex line_regex("^\\*.?(color[0-9]{1,2}|background|foreground|cursorColor):.*#[0-9a-fA-F]{6}");
 	const std::regex color_regex("#[0-9a-fA-F]{6}");
 
 
@@ -86,13 +86,17 @@ std::vector<std::string> get_xcolors() {
 			std::regex_search(line,color_match,color_regex);
 			//std::cout << color_match[0] << std::endl;
 			int color_num = 0;
-			if(std::regex_match(line, std::regex("^\\*background:.*"))) {
+			if(std::regex_match(line, std::regex("^\\*.?background:.*"))) {
 				color_num = 16;
-			} else if(std::regex_match(line, std::regex("^\\*foreground:.*"))) {
+			} else if(std::regex_match(line, std::regex("^\\*.?foreground:.*"))) {
 				color_num = 17;
-			} else if(std::regex_match(line, std::regex("^\\*cursorColor:.*"))) {
+			} else if(std::regex_match(line, std::regex("^\\*.?cursorColor:.*"))) {
 				color_num = 18;
 			} else {
+				if(line[1] == '.') {
+					line[6] = line[7];
+					line[7] = line[8];
+				}
 				color_num = line[6] - '0';
 				if(line[7] != ':')
 					color_num = color_num*10 + (line[7] - '0');
@@ -168,21 +172,25 @@ void merge_xresources(std::vector<std::string> xcolors, std::string path) {
 	}
 
 	std::string line;
-	const std::regex line_regex("^\\*(color[0-9]{1,2}|background|foreground|cursorColor):.*#[0-9a-fA-F]{6}");
+	const std::regex line_regex("^\\*.?(color[0-9]{1,2}|background|foreground|cursorColor):.*#[0-9a-fA-F]{6}");
 
 
 	while(res.good()) {
 		std::getline(res,line);
 		if(std::regex_match(line,line_regex)) {
 
-			if(std::regex_match(line, std::regex("^\\*background:.*"))) {
+			if(std::regex_match(line, std::regex("^\\*.?background:.*"))) {
 				temp << "*background: " << xcolors[16] << std::endl;
-			} else if(std::regex_match(line, std::regex("^\\*foreground:.*"))) {
+			} else if(std::regex_match(line, std::regex("^\\*.?foreground:.*"))) {
 				temp << "*foreground: " << xcolors[17] << std::endl;
-			} else if(std::regex_match(line, std::regex("^\\*cursorColor:.*"))) {
+			} else if(std::regex_match(line, std::regex("^\\*.?cursorColor:.*"))) {
 				temp << "*cursorColor: " << xcolors[18] << std::endl;
 			} else {
 				temp << "*color";
+				if(line[1] == '.') {
+					line[6] = line[7];
+					line[7] = line[8];
+				}
 				int color_num = line[6] - '0';
 				if(line[7] != ':')
 					color_num = color_num*10 + (line[7] - '0');
@@ -209,7 +217,7 @@ void merge_termite(std::vector<std::string> xcolors, std::string path) {
 	}
 
 	std::string line;
-	const std::regex line_regex("^(color[0-9]{1,2}|background|foreground|cursor).*=.*#[0-9a-fA-F]{6}");
+	const std::regex line_regex("^(color[0-9]{1,2}|background|foreground|cursor).*");
 
 
 	while(res.good()) {
@@ -251,7 +259,7 @@ void merge_rofi(std::vector<std::string> xcolors, std::string path) {
 	}
 
 	std::string line;
-	const std::regex line_regex("^rofi.color-(normal|window):");
+	const std::regex line_regex("^rofi.color-(normal|window):.*");
 
 
 	while(res.good()) {
