@@ -104,7 +104,6 @@ std::vector<std::string> get_xcolors() {
 	return xcolors;
 }
 
-
 void print_xcolors(std::vector<std::string> xcolors) {
 	printf("+------ +---------+-------+\n");
 	printf("| color |  value  | color |\n");
@@ -134,7 +133,8 @@ void gen_xresources(std::vector<std::string> xcolors, std::string path) {
 void gen_termite(std::vector<std::string> xcolors, std::string path) {
 
 		std::ofstream out(path);
-		out << "background = " << xcolors[16] << std::endl;
+		std::vector<int> c = string_to_rgb(xcolors[16]);
+		out << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", 1)" << std::endl;
 		out << "foreground = " << xcolors[17] << std::endl;
 		out << "cursor = " << xcolors[18] << std::endl;
 
