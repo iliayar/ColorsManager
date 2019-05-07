@@ -17,7 +17,7 @@ Help:
 * -p <path> - path to default xresources file
 * -r <7 int> - rofi configuration
 * -c <19 colors> - colors configuration(without xresources file)
-
+* -cr <id(int)> <color> - set color with id to color
 
 Rofi configuration:
 Pass 7 ids(id0,id1,..):
