@@ -309,45 +309,57 @@ std::vector<int> string_to_rgb(std::string color) {
 
 
 int main(int argc, char *argv[]) {
+	//Initialize global variables
 	init();
+
 	if(argc < 2) {
 		printf("Please specify the command\n");
 		return 0;
 	}
+
 	for(int i = 1; i < argc; ++i) {
 		switch (cmd[argv[i]]) {
+			// l Print Colors
 			case 1:
 				print_xcolors(global_xcolors);
 			break;
+			// -p <path> Set the path to Xresources
 			case 2:
 				i++;
 				xresources_path = argv[i];
 				global_xcolors = get_xcolors();
 			break;
+			// gx <path> Generate Xresources file
 			case 3:
 				i++;
 				gen_xresources(global_xcolors,argv[i]);
 			break;
+			// gr <path> Generate Rofi Xresources file
 			case 4:
 				i++;
 				gen_rofi(global_xcolors,argv[i]);
 			break;
+			// gt <path> Generate Termite config file
 			case 5:
 				i++;
 				gen_termite(global_xcolors,argv[i]);
 			break;
+			// mx <path> Merge with existing Xresources file
 			case 6:
 				i++;
 				merge_xresources(global_xcolors,argv[i]);
 			break;
+			// mr <path> Merge with existing Rofi Xresources file
 			case 7:
 				i++;
 				merge_rofi(global_xcolors,argv[i]);
 			break;
+			// mt <path> Merge with existing Termite config file
 			case 8:
 				i++;
 				merge_termite(global_xcolors,argv[i]);
 			break;
+			// -r <7 int> Set Rofi colors order
 			case 9:
 				if(argc - i < 7) {
 					printf("Need 7 numbers for rofi setup");
@@ -358,6 +370,7 @@ int main(int argc, char *argv[]) {
 				}
 				i += 7;
 			break;
+			// -c <19 colors> set colors configuration
 			case 10:
 				if(argc - i < 19) {
 					printf("Need 19 numbers for colors setup");
@@ -368,6 +381,7 @@ int main(int argc, char *argv[]) {
 				}
 				i+=19;
 			break;
+			// -cr <int> <color> set the color to value
 			case 11:
 				i++;
 				global_xcolors[std::stoi(argv[i])] = argv[i+1];
