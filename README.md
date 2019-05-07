@@ -1,5 +1,7 @@
 ## Colors
 
+![color table](https://raw.githubusercontent.com/iliayar/ColorsManager/master/color_table.png)
+
 For make:
 `gcc -lstdc++ src/color-utils.cpp -o color-utils`
 
@@ -35,5 +37,5 @@ color[0-15] background foreground cursorColor
 Example:
 * Set color2 to value #123456:
   ```./color-utils -p ~/.resoures/.Xresources -cr 2 \#123456 mx ~/.resources/.Xresources```
-* Print current color table(Watch iamge):
+* Print current color table(Watch image):
   ```./color-utils l```
