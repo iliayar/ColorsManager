@@ -16,10 +16,21 @@ std::vector<int> rofi_order(7);
 
 std::vector<std::string> global_xcolors(19);
 
-int xcolors_mod = 0;
+void init();
+std::vector<std::string> get_xcolors();
+void print_xcolors(std::vector<std::string> xcolors);
+void gen_xresources(std::vector<std::string> xcolors, std::string path);
+void gen_termite(std::vector<std::string> xcolors, std::string path);
+void gen_rofi(std::vector<std::string> xcolors, std::string path);
+void merge_xresources(std::vector<std::string> xcolors, std::string path);
+void merge_termite(std::vector<std::string> xcolors, std::string path);
+void merge_rofi(std::vector<std::string> xcolors, std::string path);
+std::vector<int> string_to_rgb(std::string color);
 
 void init() {
 	xresources_path = std::getenv("HOME") + xresources_path;
+
+	global_xcolors = get_xcolors();
 
 	cmd["l"]  = 1;
 	cmd["-p"] = 2;
@@ -31,7 +42,7 @@ void init() {
 	cmd["mt"] = 8;
 	cmd["-r"] = 9;
 	cmd["-c"] = 10;
-
+	cmd["-cr"] = 11;
 
 	color_order[0] = "black dark/light";
 	color_order[1] = "red dark/light";
@@ -52,8 +63,8 @@ void init() {
 }
 
 
-std::vector<std::string> get_xcolors_xresources() {
-//void get_xcolors() {
+std::vector<std::string> get_xcolors() {
+//void global_xcolors {
 	std::vector<std::string> xcolors(19);
 
 	std::ifstream xresources(xresources_path);
@@ -95,12 +106,13 @@ std::vector<std::string> get_xcolors_xresources() {
 
 
 void print_xcolors(std::vector<std::string> xcolors) {
-	printf("+------ +---------+\n");
-	printf("| color |  value  |\n");
+	printf("+------ +---------+-------+\n");
+	printf("| color |  value  | color |\n");
 	for(int i = 0; i < 19; ++i) {
-		printf("|   %2d  | %s |\n",i,xcolors[i].c_str());
+		std::vector<int> c = string_to_rgb(xcolors[i]);
+		printf("|   %2d  | %s |\e[48;2;%d;%d;%dm       \e[0m|\n",i,xcolors[i].c_str(),c[0],c[1],c[2]);
 	}
-	printf("+-------+---------+\n");
+	printf("+-------+---------+-------+\n");
 }
 
 void gen_xresources(std::vector<std::string> xcolors, std::string path) {
@@ -261,19 +273,39 @@ void merge_rofi(std::vector<std::string> xcolors, std::string path) {
 	system( std::string("mv " + path + ".temp " + path).c_str());
 }
 
+std::vector<int> string_to_rgb(std::string color) {
+	std::vector<int>  res(3);
+	if(std::isdigit(color[1]))
+		res[0] = (color[1] - '0')*16;
+	else
+		res[0] = (std::tolower(color[1]) - 'a' + 10)*16;
+	if(std::isdigit(color[2]))
+		res[0] += (color[2] - '0');
+	else
+		res[0] += (std::tolower(color[2]) - 'a' + 10);
 
-std::vector<std::string> get_xcolors() {
-	switch (xcolors_mod) {
-		case 0:
-			return get_xcolors_xresources();
-		break;
-		case 1:
-			return global_xcolors;
-		break;
-		default:
-			return get_xcolors_xresources();
-	}
+	if(std::isdigit(color[3]))
+		res[1] = (color[3] - '0')*16;
+	else
+		res[1] = (std::tolower(color[3]) - 'a' + 10)*16;
+	if(std::isdigit(color[4]))
+		res[1] += (color[4] - '0');
+	else
+		res[1] += (std::tolower(color[4]) - 'a' + 10);
+
+	if(std::isdigit(color[5]))
+		res[2] = (color[5] - '0')*16;
+	else
+		res[2] = (std::tolower(color[5]) - 'a' + 10)*16;
+	if(std::isdigit(color[6]))
+		res[2] += (color[6] - '0');
+	else
+		res[2] += (std::tolower(color[6]) - 'a' + 10);
+
+	return res;
 }
+
+
 
 
 int main(int argc, char *argv[]) {
@@ -285,35 +317,36 @@ int main(int argc, char *argv[]) {
 	for(int i = 1; i < argc; ++i) {
 		switch (cmd[argv[i]]) {
 			case 1:
-				print_xcolors(get_xcolors());
+				print_xcolors(global_xcolors);
 			break;
 			case 2:
 				i++;
 				xresources_path = argv[i];
+				global_xcolors = get_xcolors();
 			break;
 			case 3:
 				i++;
-				gen_xresources(get_xcolors(),argv[i]);
+				gen_xresources(global_xcolors,argv[i]);
 			break;
 			case 4:
 				i++;
-				gen_rofi(get_xcolors(),argv[i]);
+				gen_rofi(global_xcolors,argv[i]);
 			break;
 			case 5:
 				i++;
-				gen_termite(get_xcolors(),argv[i]);
+				gen_termite(global_xcolors,argv[i]);
 			break;
 			case 6:
 				i++;
-				merge_xresources(get_xcolors(),argv[i]);
+				merge_xresources(global_xcolors,argv[i]);
 			break;
 			case 7:
 				i++;
-				merge_rofi(get_xcolors(),argv[i]);
+				merge_rofi(global_xcolors,argv[i]);
 			break;
 			case 8:
 				i++;
-				merge_termite(get_xcolors(),argv[i]);
+				merge_termite(global_xcolors,argv[i]);
 			break;
 			case 9:
 				if(argc - i < 7) {
@@ -326,7 +359,6 @@ int main(int argc, char *argv[]) {
 				i += 7;
 			break;
 			case 10:
-				xcolors_mod = 1;
 				if(argc - i < 19) {
 					printf("Need 19 numbers for colors setup");
 					exit(1);
@@ -335,6 +367,11 @@ int main(int argc, char *argv[]) {
 					global_xcolors[q] = argv[i+q+1];
 				}
 				i+=19;
+			break;
+			case 11:
+				i++;
+				global_xcolors[std::stoi(argv[i])] = argv[i+1];
+				i++;
 			break;
 			default:
 				printf("%s: Command not found\n",argv[i]);
