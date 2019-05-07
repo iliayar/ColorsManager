@@ -217,7 +217,8 @@ void merge_termite(std::vector<std::string> xcolors, std::string path) {
 		if(std::regex_match(line,line_regex)) {
 
 			if(std::regex_match(line, std::regex("^background.*"))) {
-				temp << "background = " << xcolors[16] << std::endl;
+				std::vector<int> c = string_to_rgb(xcolors[16]);
+				temp << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", 1)" << std::endl;
 			} else if(std::regex_match(line, std::regex("^foreground.*"))) {
 				temp << "foreground = " << xcolors[17] << std::endl;
 			} else if(std::regex_match(line, std::regex("^cursor.*"))) {
