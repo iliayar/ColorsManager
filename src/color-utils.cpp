@@ -65,8 +65,6 @@ void init() {
 
 std::vector<std::string> get_xcolors() {
 //void global_xcolors {
-	std::vector<std::string> xcolors(19);
-
 	std::ifstream xresources(xresources_path);
 
 	if(!xresources) {
@@ -101,11 +99,11 @@ std::vector<std::string> get_xcolors() {
 				if(line[7] != ':')
 					color_num = color_num*10 + (line[7] - '0');
 			}
-			xcolors[color_num] = color_match[0];
+			global_xcolors[color_num] = color_match[0];
 		}
 	}
 	xresources.close();
-	return xcolors;
+	return global_xcolors;
 }
 
 void print_xcolors(std::vector<std::string> xcolors) {
@@ -138,7 +136,7 @@ void gen_termite(std::vector<std::string> xcolors, std::string path) {
 
 		std::ofstream out(path);
 		std::vector<int> c = string_to_rgb(xcolors[16]);
-		out << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", 1)" << std::endl;
+		out << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", 0.8)" << std::endl;
 		out << "foreground = " << xcolors[17] << std::endl;
 		out << "cursor = " << xcolors[18] << std::endl;
 
@@ -226,7 +224,7 @@ void merge_termite(std::vector<std::string> xcolors, std::string path) {
 
 			if(std::regex_match(line, std::regex("^background.*"))) {
 				std::vector<int> c = string_to_rgb(xcolors[16]);
-				temp << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", 1)" << std::endl;
+				temp << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", 0.8)" << std::endl;
 			} else if(std::regex_match(line, std::regex("^foreground.*"))) {
 				temp << "foreground = " << xcolors[17] << std::endl;
 			} else if(std::regex_match(line, std::regex("^cursor.*"))) {
