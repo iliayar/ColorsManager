@@ -119,6 +119,10 @@ void print_xcolors(std::vector<std::string> xcolors) {
 void gen_xresources(std::vector<std::string> xcolors, std::string path) {
 
 	std::ofstream out(path);
+	if(!out) {
+		std::cout << "Cannot open file " << path << std::endl;
+		exit(1);
+	}
 	out << "*background: " << xcolors[16] << std::endl;
 	out << "*foreground: " << xcolors[17] << std::endl;
 	out << "*cursorColor: " << xcolors[18] << std::endl;
@@ -135,6 +139,12 @@ void gen_xresources(std::vector<std::string> xcolors, std::string path) {
 void gen_termite(std::vector<std::string> xcolors, std::string path) {
 
 		std::ofstream out(path);
+		if(!out) {
+			std::cout << "Cannot open file  " << path << std::endl;
+			exit(0);
+		}
+
+
 		std::vector<int> c = string_to_rgb(xcolors[16]);
 		out << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", 0.8)" << std::endl;
 		out << "foreground = " << xcolors[17] << std::endl;
@@ -151,6 +161,11 @@ void gen_termite(std::vector<std::string> xcolors, std::string path) {
 
 void gen_rofi(std::vector<std::string> xcolors, std::string path) {
 	std::ofstream out(path);
+	if(!out) {
+		std::cout << "Cannot open file  " << path << std::endl;
+        exit(0);
+    }
+
 	out << "! State:           \'bg\',     \'fg\',     \'bgalt\',  \'hlbg\',   \'hlfg\'" << std::endl;
 	out << "rofi.color-normal: " << xcolors[rofi_order[0]] << ", " << xcolors[rofi_order[1]] << ", " <<
 	xcolors[rofi_order[2]] << ", " << xcolors[rofi_order[3]] << ", " << xcolors[rofi_order[4]] << std::endl;
@@ -163,12 +178,14 @@ void gen_rofi(std::vector<std::string> xcolors, std::string path) {
 void merge_xresources(std::vector<std::string> xcolors, std::string path) {
 	std::ifstream res(path);
 	std::ofstream temp(path + ".temp");
-
 	if(!res) {
-		std::cout << "Cannot open file " << path << std::endl;
-		exit(1);
+    	std::cout << "Cannot open file  " << path << std::endl;
+    	exit(0);
 	}
-
+	if(!temp) {
+    	std::cout << "Cannot open file  " << path + ".temp" << std::endl;
+    	exit(0);
+	}
 	std::string line;
 	const std::regex line_regex("^\\*.?(color[0-9]{1,2}|background|foreground|cursorColor):.*#[0-9a-fA-F]{6}");
 
@@ -213,7 +230,10 @@ void merge_termite(std::vector<std::string> xcolors, std::string path) {
 		std::cout << "Cannot open file " << path << std::endl;
 		exit(1);
 	}
-
+	if(!temp) {
+		std::cout << "Cannot open file " << path + ".temp" << std::endl;
+		exit(1);
+	}	
 	std::string line;
 	const std::regex line_regex("^(color[0-9]{1,2}|background|foreground|cursor).*");
 
@@ -255,7 +275,10 @@ void merge_rofi(std::vector<std::string> xcolors, std::string path) {
 		std::cout << "Cannot open file " << path << std::endl;
 		exit(1);
 	}
-
+	if(!temp) {
+		std::cout << "Cannot open file " << path+".temp" << std::endl;
+		exit(1);
+	}
 	std::string line;
 	const std::regex line_regex("^rofi.color-(normal|window):.*");
 
