@@ -16,6 +16,8 @@ std::vector<int> rofi_order(7);
 
 std::vector<std::string> global_xcolors(19);
 
+std::string alpha;
+
 void init();
 std::vector<std::string> get_xcolors();
 void print_xcolors(std::vector<std::string> xcolors);
@@ -43,6 +45,7 @@ void init() {
 	cmd["-r"] = 9;
 	cmd["-c"] = 10;
 	cmd["-cr"] = 11;
+	cmd["-alpha"] = 12;
 
 	color_order[0] = "black dark/light";
 	color_order[1] = "red dark/light";
@@ -60,6 +63,8 @@ void init() {
 	rofi_order[4] = 7;
 	rofi_order[5] = 16;
 	rofi_order[6] = 13;
+
+	alpha = "0.8";
 }
 
 
@@ -146,7 +151,7 @@ void gen_termite(std::vector<std::string> xcolors, std::string path) {
 
 
 		std::vector<int> c = string_to_rgb(xcolors[16]);
-		out << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", 0.8)" << std::endl;
+		out << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", " << alpha << " )" << std::endl;
 		out << "foreground = " << xcolors[17] << std::endl;
 		out << "cursor = " << xcolors[18] << std::endl;
 
@@ -233,7 +238,7 @@ void merge_termite(std::vector<std::string> xcolors, std::string path) {
 	if(!temp) {
 		std::cout << "Cannot open file " << path + ".temp" << std::endl;
 		exit(1);
-	}	
+	}
 	std::string line;
 	const std::regex line_regex("^(color[0-9]{1,2}|background|foreground|cursor).*");
 
@@ -244,7 +249,7 @@ void merge_termite(std::vector<std::string> xcolors, std::string path) {
 
 			if(std::regex_match(line, std::regex("^background.*"))) {
 				std::vector<int> c = string_to_rgb(xcolors[16]);
-				temp << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", 0.8)" << std::endl;
+				temp << "background = rgba(" << c[0] << ", " << c[1] << ", " << c[2] << ", " << alpha << " )" << std::endl;
 			} else if(std::regex_match(line, std::regex("^foreground.*"))) {
 				temp << "foreground = " << xcolors[17] << std::endl;
 			} else if(std::regex_match(line, std::regex("^cursor.*"))) {
@@ -416,6 +421,11 @@ int main(int argc, char *argv[]) {
 				i++;
 				global_xcolors[std::stoi(argv[i])] = argv[i+1];
 				i++;
+			break;
+			// -alpha <float>
+			case 12:
+				i++;
+				alpha = argv[i];
 			break;
 			default:
 				printf("%s: Command not found\n",argv[i]);
