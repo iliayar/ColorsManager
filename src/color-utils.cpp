@@ -32,7 +32,7 @@ std::vector<int> string_to_rgb(std::string color);
 void init() {
 	xresources_path = std::getenv("HOME") + xresources_path;
 
-	global_xcolors = get_xcolors();
+	get_xcolors();
 
 	cmd["l"]  = 1;
 	cmd["-p"] = 2;
@@ -68,13 +68,13 @@ void init() {
 }
 
 
-std::vector<std::string> get_xcolors() {
+void get_xcolors() {
 //void global_xcolors {
 	std::ifstream xresources(xresources_path);
 
 	if(!xresources) {
 		std::cout << "Cannot open file " << xresources_path << std::endl;
-		exit(1);
+		return;
 	}
 
 	std::string line;
@@ -108,7 +108,7 @@ std::vector<std::string> get_xcolors() {
 		}
 	}
 	xresources.close();
-	return global_xcolors;
+	return;
 }
 
 void print_xcolors(std::vector<std::string> xcolors) {
@@ -362,7 +362,7 @@ int main(int argc, char *argv[]) {
 			case 2:
 				i++;
 				xresources_path = argv[i];
-				global_xcolors = get_xcolors();
+				get_xcolors();
 			break;
 			// gx <path> Generate Xresources file
 			case 3:
