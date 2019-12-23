@@ -19,7 +19,7 @@ std::vector<std::string> global_xcolors(19);
 std::string alpha;
 
 void init();
-std::vector<std::string> get_xcolors();
+void get_xcolors();
 void print_xcolors(std::vector<std::string> xcolors);
 void gen_xresources(std::vector<std::string> xcolors, std::string path);
 void gen_termite(std::vector<std::string> xcolors, std::string path);
