@@ -265,7 +265,9 @@ void merge_termite(std::vector<std::string> xcolors, std::string path) {
             }
             continue;
         }
-        temp << line << std::endl;
+        if(line.length() > 0) {
+            temp << line << std::endl;
+        }
     }
 
 
@@ -301,7 +303,9 @@ void merge_rofi(std::vector<std::string> xcolors, std::string path) {
             }
             continue;
         }
-        temp << line << std::endl;
+        if(line.length() > 0) {
+            temp << line << std::endl;
+        }
     }
 
 
