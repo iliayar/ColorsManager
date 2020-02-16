@@ -2,11 +2,11 @@
 
 ![color table](https://raw.githubusercontent.com/iliayar/ColorsManager/master/color_table.png)
 
-For make:
-`gcc -lstdc++ src/color-utils.cpp -o color-utils`
+Build:
+`make`
 
-For run:
-`./color-utils`
+Install:
+`make install`
 
 Help:
 * l - list color table
